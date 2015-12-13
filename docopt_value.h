@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Jared Grubb. All rights reserved.
 //
 
-#ifndef __docopt__value__
-#define __docopt__value__
+#ifndef docopt__value_h_
+#define docopt__value_h_
 
 #include <string>
 #include <vector>
@@ -257,6 +257,17 @@ namespace docopt {
 	inline
 	long value::asLong() const
 	{
+		// Attempt to convert a string to a long
+		if (kind == Kind::String) {
+			const std::string& str = variant.strValue;
+			std::size_t pos;
+			const long ret = stol(str, &pos); // Throws if it can't convert
+			if (pos != str.length()) {
+				// The string ended in non-digits.
+				throw std::runtime_error( str + " contains non-numeric characters.");
+			}
+			return ret;
+		}
 		throwIfNotKind(Kind::Long);
 		return variant.longValue;
 	}
@@ -307,4 +318,4 @@ namespace docopt {
 	}
 }
 
-#endif /* defined(__docopt__value__) */
+#endif /* defined(docopt__value_h_) */
